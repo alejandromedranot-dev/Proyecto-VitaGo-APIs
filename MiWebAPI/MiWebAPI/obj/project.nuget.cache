@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "6xsEFDjQ5kw=",
+  "dgSpecHash": "sbhEvrZyvkE=",
   "success": true,
   "projectFilePath": "C:\\Users\\Totis\\Desktop\\proyecto_completo_apis\\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\\CRUD_NET8_HTML_JAVASCRIPT\\MiWebAPI\\MiWebAPI\\MiWebAPI.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Totis\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Totis\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\Totis\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\Totis\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
@@ -20,15 +21,5 @@
     "C:\\Users\\Totis\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\Totis\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "C:\\Users\\Totis\\Desktop\\proyecto_completo_apis\\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\\CRUD_NET8_HTML_JAVASCRIPT\\MiWebAPI\\MiWebAPI\\MiWebAPI.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\Totis\\Desktop\\proyecto_completo_apis\\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\\CRUD_NET8_HTML_JAVASCRIPT\\MiWebAPI\\MiWebAPI\\MiWebAPI.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }

@@ -16,13 +16,82 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "VitaGo.API.Controllers.DoctoresController",
+    "ContainingType": "MiWebAPI.Controllers.DoctoresController",
     "Method": "Lista",
     "RelativePath": "api/Doctores",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MiWebAPI.Controllers.DoctoresController",
+    "Method": "Crear",
+    "RelativePath": "api/Doctores",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "objeto",
+        "Type": "MiWebAPI.Models.Doctor",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MiWebAPI.Controllers.DoctoresController",
+    "Method": "Obtener",
+    "RelativePath": "api/Doctores/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MiWebAPI.Controllers.DoctoresController",
+    "Method": "Editar",
+    "RelativePath": "api/Doctores/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "objeto",
+        "Type": "MiWebAPI.Models.Doctor",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MiWebAPI.Controllers.DoctoresController",
+    "Method": "Eliminar",
+    "RelativePath": "api/Doctores/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

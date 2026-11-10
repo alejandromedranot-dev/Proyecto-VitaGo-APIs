@@ -84,3 +84,4 @@ C:\Users\Totis\Desktop\proyecto_completo_apis\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\
 C:\Users\Totis\Desktop\proyecto_completo_apis\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\CRUD_NET8_HTML_JAVASCRIPT\MiWebAPI\MiWebAPI\obj\Debug\net8.0\MiWebAPI.genruntimeconfig.cache
 C:\Users\Totis\Desktop\proyecto_completo_apis\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\CRUD_NET8_HTML_JAVASCRIPT\MiWebAPI\MiWebAPI\obj\Debug\net8.0\ref\MiWebAPI.dll
 C:\Users\Totis\Desktop\proyecto_completo_apis\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\CRUD_NET8_HTML_JAVASCRIPT\MiWebAPI\MiWebAPI\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Totis\Desktop\proyecto_completo_apis\CRUD_NET8_HTML_JAVASCRIPT_V_FINAL\CRUD_NET8_HTML_JAVASCRIPT\MiWebAPI\MiWebAPI\bin\Debug\net8.0\BCrypt-Net-Next.dll

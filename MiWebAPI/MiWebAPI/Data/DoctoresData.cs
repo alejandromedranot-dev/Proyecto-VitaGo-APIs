@@ -1,211 +1,177 @@
 ﻿using MiWebAPI.Models;
 using System.Data;
-using System.Data.SqlClient; // O Microsoft.Data.SqlClient según el paquete que estés usando
+using System.Data.SqlClient;
+using BCrypt.Net;
 
 namespace MiWebAPI.Data
 {
     public class DoctoresData
     {
-        private readonly string conexion;
+        private readonly string _conexion;
+        private readonly ILogger<DoctoresData> _logger;
 
-        // Inyectamos IConfiguration para leer la cadena de conexión desde appsettings.json
-        public DoctoresData(IConfiguration configuration)
+        public DoctoresData(IConfiguration configuration, ILogger<DoctoresData> logger)
         {
-            conexion = configuration.GetConnectionString("CadenaSQL");
+            _conexion = configuration.GetConnectionString("CadenaSQL")
+                ?? throw new InvalidOperationException(
+                    "Falta la cadena de conexión 'CadenaSQL' en appsettings.json");
+            _logger = logger;
         }
 
-        // Método para listar los registros usando el Stored Procedure
+        // ---------- Lecturas ----------
+
         public async Task<List<Doctor>> Lista()
         {
-            List<Doctor> lista = new List<Doctor>();
+            var lista = new List<Doctor>();
 
-            using (var con = new SqlConnection(conexion))
+            await using var con = new SqlConnection(_conexion);
+            await con.OpenAsync();
+
+            await using var cmd = new SqlCommand("sp_listarDoctores", con)
             {
-                await con.OpenAsync();
+                CommandType = CommandType.StoredProcedure
+            };
 
-                // Asegúrate de poner aquí el nombre exacto de tu Stored Procedure en SQL Server
-                using (SqlCommand cmd = new SqlCommand("SP_ListaEmpleados", con))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                lista.Add(Mapear(reader));
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            lista.Add(new Doctor
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nombre = reader["Nombre"] != DBNull.Value ? reader["Nombre"].ToString() : string.Empty,
-                                Apellido = reader["Apellido"] != DBNull.Value ? reader["Apellido"].ToString() : string.Empty,
-                                Especialidad = reader["Especialidad"] != DBNull.Value ? reader["Especialidad"].ToString() : string.Empty,
-                                Correo = reader["Correo"] != DBNull.Value ? reader["Correo"].ToString() : string.Empty,
-                                Telefono = Convert.ToInt32(reader["Telefono"])
-                            });
-                        }
-
-                    }
-
-                }
-
-                return lista;
-            }
+            return lista;
         }
-        public async Task<Doctor> Obtener(int Id)
+
+        public async Task<Doctor?> Obtener(Guid id)
         {
-            Doctor objeto = new Doctor();
+            await using var con = new SqlConnection(_conexion);
+            await con.OpenAsync();
 
-            using (var con = new SqlConnection(conexion))
+            await using var cmd = new SqlCommand("sp_obtenerDoctor", con)
             {
-                await con.OpenAsync();
-                SqlCommand cmd = new SqlCommand("sp_obtenerEmpleado", con);
-                cmd.Parameters.AddWithValue("@IdEmpleado", Id);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@IdDoctor", id);
 
-                using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        objeto = new Doctor
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Nombre = reader["Nombre"].ToString(),
-                            Apellido = reader["Apellido"].ToString(),
-                            Especialidad = reader["Especialidad"].ToString(),
-                            Correo = reader["Correo"].ToString(),
-                            Telefono = Convert.ToInt32(reader["Telefono"])
-                        };
-                    }
-                }
-            }
-            return objeto;
-
+            await using var reader = await cmd.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? Mapear(reader) : null;
         }
-        public async Task<RespuestaOperacion> Crear(Doctor objeto)
+
+        // ---------- Escrituras ----------
+
+        public Task<RespuestaOperacion> Crear(Doctor d)
         {
-            using (var con = new SqlConnection(conexion))
+            string hash = BCrypt.Net.BCrypt.HashPassword(d.Password);
+
+            return Ejecutar("sp_crearDoctor", p =>
             {
-                using (SqlCommand cmd = new SqlCommand("sp_crearDoctor", con))
-                {
-                    cmd.Parameters.AddWithValue("@Nombre", objeto.Nombre ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Apellido", objeto.Apellido ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Especialidad", objeto.Especialidad ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Correo", objeto.Correo ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Telefono", objeto.Telefono);
-
-                    SqlParameter numeroError = new SqlParameter("@numeroError", SqlDbType.Int)
-                    {
-                        Direction = ParameterDirection.Output
-                    };
-
-                    SqlParameter respuesta = new SqlParameter("@respuesta", SqlDbType.VarChar, 1000)
-                    {
-                        Direction = ParameterDirection.Output
-                    };
-
-                    cmd.Parameters.Add(numeroError);
-                    cmd.Parameters.Add(respuesta);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    await con.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
-
-                    return new RespuestaOperacion
-                    {
-                        NumeroError = numeroError.Value != DBNull.Value
-                            ? Convert.ToInt32(numeroError.Value)
-                            : 0,
-
-                        Respuesta = respuesta.Value != DBNull.Value
-                            ? respuesta.Value.ToString() ?? string.Empty
-                            : string.Empty
-                    };
-                }
-            }
+                p.AddWithValue("@Nombre", d.Nombre ?? string.Empty);
+                p.AddWithValue("@Apellido", d.Apellidos ?? string.Empty); // <--- Cambiado a @Apellido
+                p.AddWithValue("@Especialidad", d.Especialidad ?? string.Empty);
+                p.AddWithValue("@Cedula", d.Cedula ?? string.Empty);
+                p.AddWithValue("@Correo", d.Correo ?? string.Empty);
+                p.AddWithValue("@Telefono", (object?)d.Telefono ?? DBNull.Value);
+                p.AddWithValue("@PrecioConsulta", d.PrecioConsulta);
+                p.AddWithValue("@PasswordHash", hash);
+            });
         }
-        public async Task<RespuestaOperacion> Editar(Doctor objeto)
-        {
-            using (var con = new SqlConnection(conexion))
+
+        public Task<RespuestaOperacion> Editar(Doctor d) =>
+            Ejecutar("sp_editarDoctor", p =>
             {
-                SqlCommand cmd = new SqlCommand("sp_editarDoctor", con);
-                cmd.Parameters.AddWithValue("@IdDoctor", objeto.Id);
-                cmd.Parameters.AddWithValue("@Nombre", objeto.Nombre);
-                cmd.Parameters.AddWithValue("@Apellido", objeto.Apellido);
-                cmd.Parameters.AddWithValue("@Especialidad", objeto.Especialidad);
-                cmd.Parameters.AddWithValue("@Correo", objeto.Correo);
-                cmd.Parameters.AddWithValue("@Telefono", objeto.Telefono);
-                SqlParameter numeroError = new SqlParameter("@numeroError", SqlDbType.Int)
+                p.AddWithValue("@IdDoctor", d.Id);
+                p.AddWithValue("@Nombre", d.Nombre ?? string.Empty);
+                //p.AddWithValue("@Apellido", d.Apellido ?? string.Empty);
+                p.AddWithValue("@Especialidad", d.Especialidad ?? string.Empty);
+                p.AddWithValue("@Cedula", d.Cedula ?? string.Empty);
+                p.AddWithValue("@Correo", d.Correo ?? string.Empty);
+                p.AddWithValue("@Telefono", (object?)d.Telefono ?? DBNull.Value);
+                p.AddWithValue("@PrecioConsulta", d.PrecioConsulta);
+            });
+
+        public Task<RespuestaOperacion> Eliminar(Guid id) =>
+            Ejecutar("sp_eliminarDoctor", p => p.AddWithValue("@IdDoctor", id));
+
+        // ---------- Auxiliares ----------
+
+        /// <summary>
+        /// Ejecuta un procedure con los parámetros de salida estándar
+        /// (@numeroError y @respuesta) y devuelve un RespuestaOperacion.
+        /// </summary>
+        private async Task<RespuestaOperacion> Ejecutar(string procedimiento, Action<SqlParameterCollection> parametros)
+        {
+            try
+            {
+                await using var con = new SqlConnection(_conexion);
+                await using var cmd = new SqlCommand(procedimiento, con)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                parametros(cmd.Parameters);
+
+                var numeroError = new SqlParameter("@numeroError", SqlDbType.Int)
                 {
                     Direction = ParameterDirection.Output
                 };
-                SqlParameter respuesta = new SqlParameter("@respuesta", SqlDbType.VarChar, 1000)
+                var respuesta = new SqlParameter("@respuesta", SqlDbType.VarChar, 1000)
                 {
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(numeroError);
                 cmd.Parameters.Add(respuesta);
-                cmd.CommandType = CommandType.StoredProcedure;
 
-                try
-                {
-                    await con.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
+                await con.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
 
-                    return new RespuestaOperacion
-                    {
-                        NumeroError = Convert.ToInt32(numeroError.Value),
-                        Respuesta = respuesta.Value?.ToString() ?? string.Empty
-                    };
-                }
-                catch (Exception ex)
+                return new RespuestaOperacion
                 {
-                    return new RespuestaOperacion
-                    {
-                        NumeroError = -1,
-                        Respuesta = ex.Message
-                    };
-                }
+                    NumeroError = numeroError.Value is int n ? n : 0,
+                    Respuesta = respuesta.Value as string ?? string.Empty
+                };
             }
-        }
-
-        public async Task<RespuestaOperacion> Eliminar(int id)
-        {
-            using (var con = new SqlConnection(conexion))
+            catch (Exception ex)
             {
-                SqlCommand cmd = new SqlCommand("sp_eliminarEmpleado", con);
-                cmd.Parameters.AddWithValue("@IdEmpleado", id);
-                SqlParameter numeroError = new SqlParameter("@numeroError", SqlDbType.Int)
+                // El detalle técnico se queda en el log, no se expone al cliente
+                _logger.LogError(ex, "Error al ejecutar {Procedimiento}", procedimiento);
+                return new RespuestaOperacion
                 {
-                    Direction = ParameterDirection.Output
+                    NumeroError = -1,
+                    Respuesta = "Ocurrió un error al procesar la solicitud"
                 };
-                SqlParameter respuesta = new SqlParameter("@respuesta", SqlDbType.VarChar, 1000)
-                {
-                    Direction = ParameterDirection.Output
-                };
-                cmd.Parameters.Add(numeroError);
-                cmd.Parameters.Add(respuesta);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                try
-                {
-                    await con.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
-
-                    return new RespuestaOperacion
-                    {
-                        NumeroError = Convert.ToInt32(numeroError.Value),
-                        Respuesta = respuesta.Value?.ToString() ?? string.Empty
-                    };
-                }
-                catch (Exception ex)
-                {
-                    return new RespuestaOperacion
-                    {
-                        NumeroError = -1,
-                        Respuesta = ex.Message
-                    };
-                }
             }
         }
 
+        private static Doctor Mapear(SqlDataReader r) => new()
+        {
+            Id = r.GetGuid(r.GetOrdinal("id")),
+            UsuarioId = r.GetGuid(r.GetOrdinal("usuario_id")),
+            Nombre = Texto(r, "nombre"),
+            Apellidos = Texto(r, "apellidos"),
+            Especialidad = Texto(r, "Especialidad"),
+            Cedula = Texto(r, "cedula"),
+            Correo = Texto(r, "correo"),
+            Telefono = Texto(r, "telefono"),
+            Bio = Texto(r, "bio"),
+            AniosExperiencia = Entero(r, "anios_experiencia"),
+            NumPacientes = Entero(r, "num_pacientes"),
+            Idiomas = Texto(r, "idiomas"),
+            PrecioConsulta = r.GetDecimal(r.GetOrdinal("precio_consulta")),
+            ConsultaOnline = r.GetBoolean(r.GetOrdinal("consulta_online")),
+            Verificado = r.GetBoolean(r.GetOrdinal("verificado")),
+            EstadoRegistro = Texto(r, "estado_registro"),
+            RatingPromedio = r.IsDBNull(r.GetOrdinal("rating_promedio")) ? null : r.GetDecimal(r.GetOrdinal("rating_promedio")),
+            TotalResenas = Entero(r, "total_resenas"),
+            FotoUrl = Texto(r, "foto_url")
+        };
+
+        private static int Entero(SqlDataReader r, string columna)
+        {
+            int i = r.GetOrdinal(columna);
+            return r.IsDBNull(i) ? 0 : Convert.ToInt32(r[i]);
+        }
+
+        private static string? Texto(SqlDataReader r, string columna)
+        {
+            int i = r.GetOrdinal(columna);
+            return r.IsDBNull(i) ? null : r.GetString(i);
+        }
     }
 }
