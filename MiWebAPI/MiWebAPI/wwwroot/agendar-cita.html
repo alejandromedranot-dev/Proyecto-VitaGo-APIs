@@ -1,0 +1,367 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reserva tu cita | vitaGo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tu CSS principal -->
+    <link rel="stylesheet" href="/css/indexStyles.css">
+
+    <!-- ESTILOS EXCLUSIVOS DE ESTA PÁGINA -->
+    <style>
+        /* --- Animación del Carrusel --- */
+        .paso-carrusel {
+            display: none;
+            animation: slideFade 0.4s ease-in-out;
+        }
+
+            .paso-carrusel.activo {
+                display: block;
+            }
+
+        @keyframes slideFade {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* --- Efecto Cristal para Días y Horarios --- */
+        .btn-cristal-item {
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #4b5563;
+            transition: all 0.25s ease;
+            font-weight: 600;
+        }
+
+            .btn-cristal-item:hover:not(:disabled) {
+                background-color: rgba(16, 185, 129, 0.15);
+                border-color: rgba(16, 185, 129, 0.6);
+                color: #065f46;
+                transform: translateY(-2px);
+            }
+
+            /* Estado Activo/Seleccionado */
+            .btn-cristal-item.activo {
+                background-color: rgba(16, 185, 129, 0.8) !important;
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                color: white !important;
+                box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+                transform: scale(1.05);
+            }
+
+            /* Estado Inactivo/Pasado */
+            .btn-cristal-item:disabled {
+                background-color: rgba(243, 244, 246, 0.4);
+                border: 1px solid transparent;
+                color: #9ca3af;
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+        /* Botón final de confirmar */
+        .btn-confirmar-cristal {
+            background-color: rgba(16, 185, 129, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+            .btn-confirmar-cristal:hover {
+                background-color: rgba(16, 185, 129, 1);
+                color: white;
+                transform: translateY(-2px);
+            }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- 1. Menú dinámico -->
+    <div id="menu-dinamico"></div>
+
+    <div class="container vg-page py-4 mt-5">
+
+        <!-- Stepper Visual -->
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <span id="badge-paso-1" class="badge bg-success rounded-circle p-2">1</span>
+            <div class="progress flex-grow-1" style="height: 2px;">
+                <div id="barra-progreso-1" class="progress-bar bg-success" style="width: 100%;"></div>
+            </div>
+            <span id="badge-paso-2" class="badge bg-secondary-subtle text-secondary rounded-circle p-2">2</span>
+            <div class="progress flex-grow-1" style="height: 2px;">
+                <div id="barra-progreso-2" class="progress-bar bg-light" style="width: 0%;"></div>
+            </div>
+            <span id="badge-paso-3" class="badge bg-secondary-subtle text-secondary rounded-circle p-2">3</span>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1" id="titulo-paso">Selecciona una fecha</h1>
+                <p class="text-muted small mb-0">Confirma tu cita con <span class="fw-bold text-dark">Dra. Valeria Pérez</span> • Cardiología</p>
+            </div>
+            <a href="perfil-medico.html" class="btn btn-light border btn-sm rounded-pill px-3 fw-semibold text-muted">← Cancelar</a>
+        </div>
+
+        <div class="row g-4">
+            <!-- COLUMNA IZQUIERDA: Card del Doctor -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=150&q=80" alt="Dra. Valeria Pérez" class="rounded-circle shadow-sm" style="width: 65px; height: 65px; object-fit: cover;">
+                        <div>
+                            <div class="d-flex align-items-center gap-1">
+                                <h2 class="h6 fw-bold mb-0">Dra. Valeria Pérez</h2>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle x-small">Verificada</span>
+                            </div>
+                            <p class="text-muted x-small mb-1">Cardiología • 12 años exp.</p>
+                            <span class="text-warning x-small">⭐ 4.9 <span class="text-muted">(128)</span></span>
+                        </div>
+                    </div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small">Precio consulta</span>
+                        <span class="fs-5 fw-bold text-dark">$120.000</span>
+                    </div>
+                    <div class="text-muted x-small">📍 Clínica El Country • Bogotá</div>
+
+                    <!-- Resumen dinámico que se va llenando -->
+                    <div class="mt-4 p-3 rounded border" id="resumen-seleccion" style="display: none; background: rgba(209, 250, 229, 0.3);">
+                        <h6 class="fw-bold small mb-2 text-dark">Resumen de tu cita:</h6>
+                        <p class="small mb-1 text-success fw-bold" id="resumen-fecha"></p>
+                        <p class="small mb-0 text-success fw-bold" id="resumen-hora"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: CARRUSEL -->
+            <div class="col-lg-8">
+
+                <!-- PASO 1: CALENDARIO -->
+                <div id="paso-1" class="paso-carrusel activo">
+                    <div class="card border-0 shadow-sm p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold mb-0">Disponibilidad este mes</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-light border rounded-circle" id="btnMesAnterior" style="width: 32px; height: 32px;">&lt;</button>
+                                <span class="fw-bold small px-2" id="nombreMesEtiqueta">Octubre 2026</span>
+                                <button type="button" class="btn btn-sm btn-light border rounded-circle" id="btnMesSiguiente" style="width: 32px; height: 32px;">&gt;</button>
+                            </div>
+                        </div>
+                        <div>
+                            <!-- Días de la semana -->
+                            <div class="row text-center text-muted x-small fw-bold mb-2">
+                                <div class="col">L</div><div class="col">M</div><div class="col">X</div>
+                                <div class="col">J</div><div class="col">V</div><div class="col">S</div><div class="col">D</div>
+                            </div>
+                            <!-- Grilla del calendario generada por JS -->
+                            <div class="row text-center g-2" id="diasCalendario"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: HORARIOS CRISTAL -->
+                <div id="paso-2" class="paso-carrusel">
+                    <div class="card border-0 shadow-sm p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold mb-0">¿A qué hora te gustaría?</h6>
+                            <!-- Link estético para regresar al calendario -->
+                            <a href="javascript:void(0)" onclick="siguientePaso(1)" class="text-success small fw-semibold text-decoration-none">← Cambiar día</a>
+                        </div>
+
+                        <p class="text-muted small mb-3" id="etiquetaFechaSeleccionada"></p>
+
+                        <div class="d-flex flex-wrap gap-2" id="contenedorHorarios">
+                            <button type="button" class="btn btn-sm px-4 py-2 horario-chip btn-cristal-item" data-hora="08:00">08:00 AM</button>
+                            <button type="button" class="btn btn-sm px-4 py-2 horario-chip btn-cristal-item" data-hora="08:30">08:30 AM</button>
+                            <button type="button" class="btn btn-sm px-4 py-2 horario-chip btn-cristal-item" data-hora="09:00">09:00 AM</button>
+                            <button type="button" class="btn btn-sm px-4 py-2 btn-cristal-item" disabled>09:30 AM</button>
+                            <button type="button" class="btn btn-sm px-4 py-2 horario-chip btn-cristal-item" data-hora="10:00">10:00 AM</button>
+                            <button type="button" class="btn btn-sm px-4 py-2 horario-chip btn-cristal-item" data-hora="11:30">11:30 AM</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 3: CONFIRMAR -->
+                <div id="paso-3" class="paso-carrusel">
+                    <div class="card border-0 shadow-sm p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0">Último paso (Opcional)</h6>
+                            <a href="javascript:void(0)" onclick="siguientePaso(2)" class="text-success small fw-semibold text-decoration-none">← Cambiar hora</a>
+                        </div>
+
+                        <label class="text-muted small mb-2">¿Cuál es el motivo de tu consulta?</label>
+                        <textarea class="form-control bg-light border-0 mb-4" rows="3" placeholder="Ej. Chequeo de rutina, dolor en el pecho..."></textarea>
+
+                        <!-- Botón Confirmar Cristal -->
+                        <div class="d-grid">
+                            <button type="button" id="btnConfirmarFinal" class="btn btn-confirmar-cristal btn-lg py-3 rounded-pill">
+                                Confirmar mi cita ✔️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Navbar Dinámico -->
+    <script src="/js/navbar.js"></script>
+
+    <!-- Script Lógica Completa -->
+    <script>
+        let fechaActual = new Date();
+        let fechaSeleccionada = null;
+        let horaSeleccionada = null;
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+        // LÓGICA DE CARRUSEL
+        function siguientePaso(paso) {
+            document.querySelectorAll('.paso-carrusel').forEach(p => p.classList.remove('activo'));
+            document.getElementById(`paso-${paso}`).classList.add('activo');
+
+            const titulo = document.getElementById("titulo-paso");
+            if (paso === 1) {
+                titulo.textContent = "Selecciona una fecha";
+                document.getElementById("barra-progreso-1").style.width = "100%";
+                document.getElementById("badge-paso-2").className = "badge bg-secondary-subtle text-secondary rounded-circle p-2";
+                document.getElementById("barra-progreso-2").style.width = "0%";
+                document.getElementById("badge-paso-3").className = "badge bg-secondary-subtle text-secondary rounded-circle p-2";
+            } else if (paso === 2) {
+                titulo.textContent = "Elige la hora";
+                document.getElementById("badge-paso-2").className = "badge bg-success rounded-circle p-2";
+                document.getElementById("barra-progreso-2").style.width = "100%";
+                document.getElementById("badge-paso-3").className = "badge bg-secondary-subtle text-secondary rounded-circle p-2";
+            } else if (paso === 3) {
+                titulo.textContent = "Confirma tu cita";
+                document.getElementById("badge-paso-3").className = "badge bg-success rounded-circle p-2";
+            }
+        }
+
+        // LÓGICA CALENDARIO CON EFECTO CRISTAL
+        function renderizarCalendario() {
+            const contenedorDias = document.getElementById("diasCalendario");
+            const etiquetaMes = document.getElementById("nombreMesEtiqueta");
+            const año = fechaActual.getFullYear();
+            const mes = fechaActual.getMonth();
+
+            etiquetaMes.textContent = `${meses[mes]} ${año}`;
+            contenedorDias.innerHTML = "";
+
+            const primerDiaMes = new Date(año, mes, 1);
+            const ultimoDiaMes = new Date(año, mes + 1, 0).getDate();
+            let diaInicioSemana = primerDiaMes.getDay();
+            diaInicioSemana = diaInicioSemana === 0 ? 6 : diaInicioSemana - 1;
+
+            for (let i = 0; i < diaInicioSemana; i++) {
+                const divVacio = document.createElement("div");
+                divVacio.style.flex = "0 0 14.28%";
+                divVacio.style.maxWidth = "14.28%";
+                contenedorDias.appendChild(divVacio);
+            }
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            for (let dia = 1; dia <= ultimoDiaMes; dia++) {
+                const divDia = document.createElement("div");
+                divDia.style.flex = "0 0 14.28%";
+                divDia.style.maxWidth = "14.28%";
+                divDia.style.marginBottom = "8px";
+
+                const boton = document.createElement("button");
+                boton.type = "button";
+                boton.className = "btn btn-sm w-100 rounded py-2 btn-cristal-item";
+                boton.textContent = dia;
+
+                const fechaBoton = new Date(año, mes, dia);
+
+                if (fechaBoton < hoy) {
+                    boton.disabled = true;
+                } else {
+                    if (fechaSeleccionada && fechaBoton.getTime() === fechaSeleccionada.getTime()) {
+                        boton.classList.add("activo");
+                    }
+
+                    boton.addEventListener("click", function () {
+                        fechaSeleccionada = fechaBoton;
+                        // Formato de texto para guardar en memoria
+                        const strFecha = `${fechaSeleccionada.getDate()} de ${meses[fechaSeleccionada.getMonth()]} ${fechaSeleccionada.getFullYear()}`;
+
+                        document.getElementById("etiquetaFechaSeleccionada").textContent = "Día elegido: " + strFecha;
+                        document.getElementById("resumen-fecha").textContent = `📅 ${strFecha}`;
+                        document.getElementById("resumen-seleccion").style.display = "block";
+
+                        // Guardar en LocalStorage
+                        localStorage.setItem("cita_fecha", strFecha);
+
+                        renderizarCalendario();
+
+                        // AVANCE AUTOMÁTICO AL PASO 2 TRAS 400ms
+                        setTimeout(() => {
+                            siguientePaso(2);
+                        }, 400);
+                    });
+                }
+                divDia.appendChild(boton);
+                contenedorDias.appendChild(divDia);
+            }
+        }
+
+        // LÓGICA HORARIOS CON EFECTO CRISTAL Y AVANCE AUTOMÁTICO
+        document.querySelectorAll(".horario-chip").forEach(chip => {
+            chip.addEventListener("click", function () {
+                document.querySelectorAll(".horario-chip").forEach(c => c.classList.remove("activo"));
+                this.classList.add("activo");
+
+                horaSeleccionada = this.getAttribute("data-hora");
+                document.getElementById("resumen-hora").textContent = `⏱️ ${horaSeleccionada} hrs`;
+
+                // Guardar en LocalStorage
+                localStorage.setItem("cita_hora", horaSeleccionada);
+
+                // AVANCE AUTOMÁTICO AL PASO 3 TRAS 400ms
+                setTimeout(() => {
+                    siguientePaso(3);
+                }, 400);
+            });
+        });
+
+        // Controles Meses
+        document.getElementById("btnMesAnterior").addEventListener("click", () => {
+            fechaActual.setMonth(fechaActual.getMonth() - 1);
+            renderizarCalendario();
+        });
+        document.getElementById("btnMesSiguiente").addEventListener("click", () => {
+            fechaActual.setMonth(fechaActual.getMonth() + 1);
+            renderizarCalendario();
+        });
+
+        // BOTÓN FINAL PARA IR A CONFIRMACIÓN
+        document.getElementById("btnConfirmarFinal").addEventListener("click", () => {
+            // Asegúrate de que este nombre (confirmacion.html) coincida con el nombre de tu archivo guardado
+            window.location.href = "confirmacion.html";
+        });
+
+        document.addEventListener("DOMContentLoaded", renderizarCalendario);
+    </script>
+</body>
+</html>
