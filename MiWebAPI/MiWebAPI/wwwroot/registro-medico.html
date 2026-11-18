@@ -10,23 +10,11 @@
 </head>
 <body class="bg-light">
 
-    <div class="container vg-page py-4">
+    <!-- 1. Menú dinámico llamado desde JavaScript -->
+    <div id="menu-dinamico"></div>
 
-        <!-- Navbar -->
-        <nav class="vg-navbar mb-4">
-            <a class="vg-brand text-decoration-none" href="index.html">
-                <span class="vg-brand-mark">
-                    <img src="assets/img/vitago-icon.png" alt="vitaGo" class="vg-brand-logo">
-                </span>
-                <span class="vg-brand-text">
-                    <span class="vg-brand-name">vitaGo</span>
-                    <span class="vg-brand-tag">Medical appointments, simplified.</span>
-                </span>
-            </a>
-            <div class="vg-nav-actions">
-                <a href="dashboard.html" class="vg-btn vg-btn-outline">Log in</a>
-            </div>
-        </nav>
+    <!-- Se agrega mt-5 para dar espacio debajo del menú fijo -->
+    <div class="container vg-page py-4 mt-5">
 
         <!-- Contenedor Principal de Registro -->
         <div class="row justify-content-center">
@@ -43,7 +31,7 @@
                     <!-- Formulario de Registro de Médico -->
                     <form id="formRegistroMedico">
 
-                        <h6 class="fw-bold text-primary mb-3">👤 Datos Personales y Profesionales</h6>
+                        <h6 class="fw-bold text-success mb-3">👤 Datos Personales y Profesionales</h6>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
@@ -87,7 +75,7 @@
 
                         <hr class="my-4 text-muted opacity-25">
 
-                        <h6 class="fw-bold text-primary mb-3">🏥 Consultorio y Horarios</h6>
+                        <h6 class="fw-bold text-success mb-3">🏥 Consultorio y Horarios</h6>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
@@ -112,8 +100,8 @@
                         </div>
 
                         <!-- Botón de Envío -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="vg-btn vg-btn-primary py-2 fw-bold text-white">Registrar Médico</button>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg py-2 fw-bold text-white shadow-sm rounded-pill">Registrar Médico</button>
                         </div>
 
                     </form>
@@ -130,13 +118,21 @@
 
     </div>
 
-    <!-- Script de conexión con la API (opcional para cuando conectes el fetch) -->
-    <!--<script>
+    <!-- Script del Navbar Dinámico -->
+    <script src="/js/navbar.js"></script>
+
+    <!-- Script de conexión con la API -->
+    <script>
         document.getElementById("formRegistroMedico").addEventListener("submit", function(e) {
             e.preventDefault();
-            alert("¡Datos del médico capturados correctamente! Aquí puedes agregar tu función fetch para enviarlos a la API.");-->
+            alert("¡Datos del médico capturados correctamente! Aquí puedes agregar tu función fetch para enviarlos a la API.");
+
             // Ejemplo de estructura fetch posterior:
-            // let formData = { nombre: document.getElementById("nombre").value, ... };
+            // let formData = {
+            //     nombre: document.getElementById("nombre").value,
+            //     apellidos: document.getElementById("apellidos").value
+            //     // ... etc
+            // };
         });
     </script>
 </body>

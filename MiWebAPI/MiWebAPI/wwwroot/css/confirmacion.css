@@ -1,0 +1,195 @@
+﻿/* Variables y estilos base de la confirmación */
+:root {
+    --primary-blue: #2563EB;
+    --primary-blue-hover: #1D4ED8;
+    --success-green-bg: #D1FAE5;
+    --success-green-text: #065F46;
+    --success-icon: #10B981;
+    --bg-color: #F9FAFB;
+    --card-bg: #FFFFFF;
+    --text-main: #111827;
+    --text-muted: #6B7280;
+    --text-light: #9CA3AF;
+    --border-color: #E5E7EB;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Main Container (Ajustado para no chocar con el navbar flotante) */
+.confirmation-container {
+    width: 100%;
+    max-width: 680px;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px; /* Da espacio para el menú dinámico */
+}
+
+/* Success Status */
+.success-circle {
+    width: 64px;
+    height: 64px;
+    background-color: var(--success-green-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+    .success-circle svg {
+        width: 32px;
+        height: 32px;
+        color: var(--success-icon);
+    }
+
+.confirmation-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.confirmation-subtitle {
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 32px;
+    font-size: 15px;
+}
+
+/* Card */
+.confirmation-card {
+    background-color: var(--card-bg);
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.card-header-confirm {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title-confirm {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-folio {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.status-badge {
+    background-color: var(--success-green-bg);
+    color: var(--success-green-text);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .status-badge::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: var(--success-green-text);
+        border-radius: 50%;
+    }
+
+/* Grid de Detalles */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    margin-bottom: 32px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* Botones de Acción */
+.actions-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-download {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+    .btn-download:hover {
+        background-color: var(--bg-color);
+    }
+
+/* Footer Text */
+.footer-note {
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+/* Media Queries para Celulares */
+@media (max-width: 600px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .confirmation-card {
+        padding: 24px;
+    }
+}

@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiWebAPI.Data;
 using MiWebAPI.Models;
+using MiWebAPI.Services;
+using System.Security.Claims;
 
 namespace MiWebAPI.Controllers
 {
@@ -7,45 +11,63 @@ namespace MiWebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        // Se compara contra este hash cuando el correo no existe, para que
+        // la respuesta tarde lo mismo y no se pueda averiguar qué correos están registrados
+        private static readonly string HashFalso =
+            BCrypt.Net.BCrypt.HashPassword("contrasena-falsa-para-igualar-tiempos");
 
-        public AuthController(IConfiguration configuration)
+        private readonly AuthData _authData;
+        private readonly JwtService _jwt;
+
+        public AuthController(AuthData authData, JwtService jwt)
         {
-            _configuration = configuration;
+            _authData = authData;
+            _jwt = jwt;
         }
 
+        // POST api/auth/login
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest req)
         {
-            string correoConfigurado = _configuration["DemoLogin:Correo"] ?? string.Empty;
-            string passwordConfigurado = _configuration["DemoLogin:Password"] ?? string.Empty;
-            string nombreConfigurado = _configuration["DemoLogin:Nombre"] ?? "Usuario";
+            UsuarioLogin? u = await _authData.ObtenerPorCorreo(req.Correo.Trim());
 
-            bool credencialesCorrectas =
-                request.Correo.Equals(correoConfigurado, StringComparison.OrdinalIgnoreCase) &&
-                request.Password == passwordConfigurado;
+            bool valida = Verificar(req.Password, u?.PasswordHash ?? HashFalso);
 
-            if (!credencialesCorrectas)
-            {
-                return Unauthorized(new
+            if (u is null || u.PasswordHash is null || !valida)
+                return Unauthorized(new RespuestaOperacion
                 {
-                    isSuccess = false,
-                    numeroError = 401,
-                    respuesta = "Correo o contraseña incorrectos"
+                    NumeroError = 401,
+                    Respuesta = "Correo o contraseña incorrectos"
                 });
-            }
 
-            return Ok(new
+            var (token, expira) = _jwt.Generar(u);
+
+            return Ok(new LoginRespuesta
             {
-                isSuccess = true,
-                numeroError = 0,
-                respuesta = "Inicio de sesión correcto",
-                usuario = new
-                {
-                    nombre = nombreConfigurado,
-                    correo = correoConfigurado
-                }
+                Token = token,
+                ExpiraEn = expira,
+                UsuarioId = u.UsuarioId,
+                PerfilId = u.PerfilId,
+                Rol = u.Rol,
+                Nombre = u.Nombre,
+                Correo = u.Correo
             });
+        }
+
+        // GET api/auth/yo  (sirve para comprobar que el token funciona)
+        [Authorize]
+        [HttpGet("yo")]
+        public IActionResult Yo() => Ok(new
+        {
+            UsuarioId = User.FindFirstValue("sub"),
+            Rol = User.FindFirstValue("role"),
+            PerfilId = User.FindFirstValue("perfil_id")
+        });
+
+        private static bool Verificar(string password, string hash)
+        {
+            try { return BCrypt.Net.BCrypt.Verify(password, hash); }
+            catch (Exception) { return false; } // hash inválido (p. ej. datos de ejemplo)
         }
     }
 }
